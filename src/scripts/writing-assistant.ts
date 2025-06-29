@@ -444,6 +444,7 @@ export class WritingAssistant {
       if (popupTitle.includes('Focus Mode') && this.currentMode === 'psychedelic') {
         console.log('User accepted dull mode popup');
         this.currentMode = 'dull';
+        this.disablePsychedelicBackground();
         this.enableDullMode();
         
         // Clear the current timer and schedule next popup
@@ -639,11 +640,13 @@ export class WritingAssistant {
   }
 
   private enableDullMode(): void {
+    this.disablePsychedelicBackground();
     this.body.classList.add('dull-mode');
   }
 
   private disableDullMode(): void {
     this.body.classList.remove('dull-mode');
+    this.disablePsychedelicBackground();
   }
 
   private startModeCycling(): void {
