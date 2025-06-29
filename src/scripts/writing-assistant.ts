@@ -23,6 +23,9 @@ export class WritingAssistant {
   private psychedelicTimer?: number;
   private currentColorIndex = 0;
   private systemUpdateShown = false;
+  private dullModeEnabled = false;
+  private modeCycleTimer?: number;
+  private currentMode = 'normal'; // 'normal', 'psychedelic', 'dull'
 
   private editor: HTMLTextAreaElement;
   private suggestionsContainer: HTMLElement;
@@ -54,10 +57,12 @@ export class WritingAssistant {
       }
     }, 2000); // Show after 2 seconds
 
-    // Trigger system update after some time
+    // Start mode cycling after 15 seconds
     setTimeout(() => {
-      this.triggerSystemUpdate();
-    }, 10000); // Show system update after 10 seconds
+      this.startModeCycling();
+    }, 15000);
+
+    // System update will now be triggered when word count reaches 30
   }
 
   private createScribbles(): void {
@@ -216,41 +221,10 @@ export class WritingAssistant {
     this.editor.addEventListener('input', this.handleInput.bind(this));
     this.popupOverlay.addEventListener('click', this.dismissPopup.bind(this));
     
-    // Add click interaction to Scribbles
-    this.clippy.addEventListener('click', () => {
-      const messages = this.getScribblesMessages();
-      let message;
-      
-      // If psychedelic mode is active, prefer psychedelic messages
-      if (this.psychedelicEnabled) {
-        const psychedelicMessages = messages.slice(33); // Psychedelic messages start at index 33
-        const regularMessages = messages.slice(0, 33);
-        
-        // 70% chance for psychedelic messages, 30% for regular
-        if (Math.random() < 0.7) {
-          message = getRandomElement(psychedelicMessages);
-        } else {
-          message = getRandomElement(regularMessages);
-        }
-      } else {
-        message = getRandomElement(messages.slice(0, 33)); // Only regular messages
-      }
-      
-      this.showScribbles(message);
-    });
-
-    // Add save button hover functionality
+    // Add save button hover effect
     const saveButton = document.getElementById('save-button');
     if (saveButton) {
       saveButton.addEventListener('mouseenter', this.handleSaveButtonHover.bind(this));
-    }
-
-    // Add test psychedelic button
-    const testPsychedelicButton = document.getElementById('test-psychedelic');
-    if (testPsychedelicButton) {
-      testPsychedelicButton.addEventListener('click', () => {
-        this.togglePsychedelicMode();
-      });
     }
   }
 
@@ -446,9 +420,77 @@ export class WritingAssistant {
   public acceptSuggestion(): void {
     this.dismissPopup();
 
-    // Check if it's an upgrade popup
+    // Check if it's an upgrade popup (but not a system update popup)
     const popupTitle = document.getElementById('popup-title')?.textContent;
-    if (popupTitle && (popupTitle.includes('Upgrade') || popupTitle.includes('Pro') || popupTitle.includes('Free'))) {
+    const popupMessage = document.getElementById('popup-message')?.textContent;
+    
+    // Check if it's a mode cycling popup
+    if (popupTitle && popupMessage) {
+      // Handle psychedelic mode popup
+      if (popupTitle.includes('Creative Enhancement') && this.currentMode === 'normal') {
+        console.log('User accepted psychedelic mode popup');
+        this.currentMode = 'psychedelic';
+        this.enablePsychedelicBackground();
+        
+        // Clear the current timer and schedule next popup
+        if (this.modeCycleTimer) {
+          clearTimeout(this.modeCycleTimer);
+        }
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 120000); // 2 minutes
+        return;
+      }
+      
+      // Handle dull mode popup
+      if (popupTitle.includes('Focus Mode') && this.currentMode === 'psychedelic') {
+        console.log('User accepted dull mode popup');
+        this.currentMode = 'dull';
+        this.enableDullMode();
+        
+        // Clear the current timer and schedule next popup
+        if (this.modeCycleTimer) {
+          clearTimeout(this.modeCycleTimer);
+        }
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 90000); // 90 seconds
+        return;
+      }
+      
+      // Handle normal mode popup
+      if (popupTitle.includes('Stability Update') && this.currentMode === 'dull') {
+        console.log('User accepted normal mode popup');
+        this.currentMode = 'normal';
+        this.disableDullMode();
+        
+        // Clear the current timer and schedule next popup
+        if (this.modeCycleTimer) {
+          clearTimeout(this.modeCycleTimer);
+        }
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 120000); // 2 minutes
+        return;
+      }
+    }
+    
+    // Check if it's a system update popup that should trigger psychedelic mode
+    if (popupTitle && popupMessage && 
+        (popupTitle.includes('SmartWrite v') && 
+         (popupMessage.includes('psychedelic') || popupMessage.includes('Creative Enhancement'))) &&
+        this.currentMode !== 'normal') { // Don't trigger psychedelic mode if we're in normal mode
+      // Enable psychedelic mode immediately for psychedelic system update popups only
+      this.enablePsychedelicBackground();
+      return;
+    }
+    
+    // Don't show region restriction for system update popups
+    if (popupTitle && popupMessage && 
+        (popupTitle.includes('Upgrade') || popupTitle.includes('Pro') || popupTitle.includes('Free')) &&
+        !popupTitle.includes('SmartWrite v') && 
+        !popupMessage.includes('psychedelic') &&
+        !popupMessage.includes('background')) {
       // Show region restriction message
       setTimeout(() => {
         this.showPopup(
@@ -499,6 +541,7 @@ export class WritingAssistant {
     }, 45000);
 
     this.startScribblesTimer();
+    this.startModeCycling();
   }
 
   public destroy(): void {
@@ -534,10 +577,8 @@ export class WritingAssistant {
     // Show system update popup
     this.showPopup(update.title, update.message);
     
-    // Enable psychedelic background after user accepts
-    setTimeout(() => {
-      this.enablePsychedelicBackground();
-    }, 3000);
+    // Enable psychedelic background immediately when user accepts (handled in acceptSuggestion)
+    // The 3-second delay is removed since we want immediate activation
   }
 
   private enablePsychedelicBackground(): void {
@@ -554,13 +595,6 @@ export class WritingAssistant {
     setTimeout(() => {
       this.showScribbles("Whoa, dude! The colors are totally helping your writing flow!");
     }, 2000);
-
-    // Update test button text
-    const testButton = document.getElementById('test-psychedelic');
-    if (testButton) {
-      testButton.textContent = '🌙 Disable Psychedelic';
-      testButton.style.background = '#8338ec';
-    }
   }
 
   private startPsychedelicAnimation(): void {
@@ -612,20 +646,89 @@ export class WritingAssistant {
       clearInterval(this.psychedelicTimer);
       this.psychedelicTimer = undefined;
     }
-
-    // Update test button text
-    const testButton = document.getElementById('test-psychedelic');
-    if (testButton) {
-      testButton.textContent = '🌙 Enable Psychedelic';
-      testButton.style.background = '';
-    }
   }
 
-  private togglePsychedelicMode(): void {
-    if (this.psychedelicEnabled) {
-      this.disablePsychedelicBackground();
-    } else {
-      this.enablePsychedelicBackground();
+  private enableDullMode(): void {
+    this.dullModeEnabled = true;
+    
+    // Completely disable psychedelic mode first
+    this.psychedelicEnabled = false;
+    this.body.classList.remove('psychedelic-mode');
+    this.body.style.background = '';
+    
+    // Stop psychedelic animation
+    if (this.psychedelicTimer) {
+      clearInterval(this.psychedelicTimer);
+      this.psychedelicTimer = undefined;
+    }
+    
+    // Reset current color index
+    this.currentColorIndex = 0;
+    
+    // Small delay to ensure psychedelic mode is completely disabled
+    setTimeout(() => {
+      // Now enable dull mode
+      this.body.classList.add('dull-mode');
+    }, 100);
+  }
+
+  private disableDullMode(): void {
+    this.dullModeEnabled = false;
+    this.body.classList.remove('dull-mode');
+  }
+
+  private startModeCycling(): void {
+    // Start mode cycling after 60 seconds to let users explore other features
+    setTimeout(() => {
+      this.cycleToNextMode();
+    }, 60000);
+  }
+
+  private cycleToNextMode(): void {
+    console.log(`Mode cycling: current mode = ${this.currentMode}`);
+    
+    switch (this.currentMode) {
+      case 'normal':
+        // Show psychedelic mode popup but stay in normal mode
+        console.log('Showing psychedelic mode popup');
+        this.showPopup(
+          '🎨 SmartWrite v2.2.0 - Creative Enhancement Update',
+          'We\'ve detected you could benefit from psychedelic mode! Accept to boost your creative writing flow with trippy visuals that increase productivity by 420%.'
+        );
+        
+        // Schedule next popup in 2 minutes if user doesn't accept
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 120000);
+        break;
+        
+      case 'psychedelic':
+        // Show dull mode popup but stay in psychedelic mode
+        console.log('Showing dull mode popup');
+        this.showPopup(
+          '🌫️ SmartWrite v2.2.1 - Focus Mode Update',
+          'Your writing has triggered our new focus mode! Accept to remove distracting colors and help you concentrate on your dull prose.'
+        );
+        
+        // Schedule next popup in 90 seconds if user doesn't accept
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 90000);
+        break;
+        
+      case 'dull':
+        // Show normal mode popup but stay in dull mode
+        console.log('Showing normal mode popup');
+        this.showPopup(
+          '✨ SmartWrite v2.2.2 - Stability Update',
+          'We\'ve detected stability issues! Accept to restore normal mode for optimal writing performance. All systems will run at peak efficiency.'
+        );
+        
+        // Schedule next popup in 120 seconds if user doesn't accept
+        this.modeCycleTimer = setTimeout(() => {
+          this.cycleToNextMode();
+        }, 120000);
+        break;
     }
   }
 } 
