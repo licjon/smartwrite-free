@@ -191,7 +191,7 @@ export class WritingAssistant {
 
   private startScribblesTimer(): void {
     this.clippyTimer = setInterval(() => {
-      if (this.editor.value.length > 10 && Math.random() < 0.3) {
+      if (this.editor.value.length > 10 && Math.random() < 0.4) {
         const messages = this.getScribblesMessages();
         let message;
         
@@ -549,22 +549,78 @@ export class WritingAssistant {
     if (this.randomInterferenceTimer) clearInterval(this.randomInterferenceTimer);
     if (this.clippyTimer) clearInterval(this.clippyTimer);
     if (this.psychedelicTimer) clearInterval(this.psychedelicTimer);
+    
+    // Clean up any flying rocket elements
+    const flyingRocket = document.getElementById('rocket-emoji-fly');
+    if (flyingRocket) {
+      flyingRocket.remove();
+    }
+    
+    // Reset save button to normal state
+    const saveButton = document.getElementById('save-button') as HTMLButtonElement;
+    if (saveButton) {
+      saveButton.classList.remove('flying');
+      saveButton.style.position = '';
+      saveButton.style.top = '';
+      saveButton.style.left = '';
+      saveButton.style.zIndex = '';
+      saveButton.style.transition = '';
+      saveButton.style.transform = '';
+      saveButton.style.opacity = '1';
+    }
+    
     this.disablePsychedelicBackground();
   }
 
   private handleSaveButtonHover(event: Event): void {
     const button = event.target as HTMLButtonElement;
     const originalText = button.textContent;
-    
     // Only change button text to something ridiculous if psychedelic mode is active
     if (this.psychedelicEnabled) {
       button.textContent = '🚀 Launch to Mars';
-      
       // Reset after a delay
       setTimeout(() => {
         button.textContent = originalText;
       }, 2000);
     }
+  }
+
+  public handleSaveClick(event: Event): void {
+    const saveButton = document.getElementById('save-button') as HTMLButtonElement;
+    if (
+      this.psychedelicEnabled &&
+      saveButton &&
+      saveButton.textContent &&
+      saveButton.textContent.includes('🚀 Launch to Mars')
+    ) {
+      if (document.getElementById('rocket-emoji-fly')) return;
+      
+      // Create a big rocket in the center of the page
+      const rocket = document.createElement('div');
+      rocket.id = 'rocket-emoji-fly';
+      rocket.textContent = '🚀';
+      rocket.style.position = 'fixed';
+      rocket.style.left = '50%';
+      rocket.style.top = '50%';
+      rocket.style.fontSize = '8rem';
+      rocket.style.zIndex = '9999';
+      rocket.style.pointerEvents = 'none';
+      rocket.style.transform = 'translate(-50%, -50%)';
+      rocket.style.transition = 'all 3s ease-out';
+      document.body.appendChild(rocket);
+      
+      // Launch the rocket off the screen after a brief pause
+      setTimeout(() => {
+        rocket.style.transform = 'translate(-50%, -50%) translate(100vw, -100vh) rotate(45deg) scale(0.8)';
+        rocket.style.opacity = '0';
+      }, 200);
+      
+      // Remove the rocket after animation completes
+      setTimeout(() => {
+        rocket.remove();
+      }, 3200);
+    }
+    // (Optional: add normal save logic here)
   }
 
   private enablePsychedelicBackground(): void {
@@ -632,10 +688,25 @@ export class WritingAssistant {
       clearInterval(this.psychedelicTimer);
       this.psychedelicTimer = undefined;
     }
-    // Always reset the save button text when psychedelic mode ends
+    
+    // Clean up any flying rocket elements
+    const flyingRocket = document.getElementById('rocket-emoji-fly');
+    if (flyingRocket) {
+      flyingRocket.remove();
+    }
+    
+    // Reset save button to normal state
     const saveButton = document.getElementById('save-button') as HTMLButtonElement;
     if (saveButton) {
       saveButton.textContent = '💾 Save to Cloud';
+      saveButton.classList.remove('flying');
+      saveButton.style.position = '';
+      saveButton.style.top = '';
+      saveButton.style.left = '';
+      saveButton.style.zIndex = '';
+      saveButton.style.transition = '';
+      saveButton.style.transform = '';
+      saveButton.style.opacity = '1';
     }
   }
 
