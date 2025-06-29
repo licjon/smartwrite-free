@@ -646,6 +646,11 @@ export class WritingAssistant {
       clearInterval(this.psychedelicTimer);
       this.psychedelicTimer = undefined;
     }
+    // Always reset the save button text when psychedelic mode ends
+    const saveButton = document.getElementById('save-button') as HTMLButtonElement;
+    if (saveButton) {
+      saveButton.textContent = '💾 Save to Cloud';
+    }
   }
 
   private enableDullMode(): void {

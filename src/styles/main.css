@@ -713,4 +713,13 @@ body {
 
 .psychedelic-mode .speech-arrow::before {
   border-top-color: #333;
+}
+
+/* Dull Mode Styles */
+body.dull-mode {
+  filter: grayscale(1) !important;
+}
+
+body.dull-mode .psychedelic-mode {
+  filter: grayscale(1) !important;
 } 
