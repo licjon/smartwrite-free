@@ -35,6 +35,6 @@ window.handleSaveClick = () => {
       preventDefault: () => {},
       stopPropagation: () => {}
     } as Event;
-    writingAssistant['handleSaveClick'](fakeEvent);
+    (writingAssistant as any).handleSaveClick(fakeEvent);
   }
 }; 

@@ -1,6 +1,6 @@
 import type { WritingStats } from '../types';
 import { WORD_REPLACEMENTS, ANNOYING_POPUPS, RANDOM_ADDITIONS, SUGGESTIONS, INTERFERENCE_MESSAGES, CONFIG, AGGRESSIVE_AUTOCORRECT, SYSTEM_UPDATES, PSYCHEDELIC_CONFIG } from '../utils/constants';
-import { calculateWordCount, calculateCharCount, calculateEngagementScore, generateId, debounce, getRandomElement, shuffleArray, applyRandomAddition } from '../utils/helpers';
+import { calculateWordCount, calculateCharCount, calculateEngagementScore, getRandomElement, shuffleArray, applyRandomAddition } from '../utils/helpers';
 
 export class WritingAssistant {
   private stats: WritingStats = {
@@ -15,7 +15,6 @@ export class WritingAssistant {
   private interferenceTimer?: number;
   private autoSaveTimer?: number;
   private randomInterferenceTimer?: number;
-  private lastInterferenceTime = 0; // Track when last interference occurred
   private clippyTimer?: number;
   private clippyVisible = false;
   private introShown = false; // Track if intro message has been shown
@@ -23,7 +22,6 @@ export class WritingAssistant {
   private psychedelicTimer?: number;
   private currentColorIndex = 0;
   private systemUpdateShown = false;
-  private dullModeEnabled = false;
   private modeCycleTimer?: number;
   private currentMode = 'normal'; // 'normal', 'psychedelic', 'dull'
 
@@ -34,7 +32,7 @@ export class WritingAssistant {
   private notification: HTMLElement;
   private clippy!: HTMLElement;
   private clippySpeechBubble!: HTMLElement;
-  private body: HTMLBodyElement;
+  private body: HTMLElement;
 
   constructor() {
     this.editor = document.getElementById('editor') as HTMLTextAreaElement;
@@ -568,19 +566,6 @@ export class WritingAssistant {
     }
   }
 
-  private triggerSystemUpdate(): void {
-    if (this.systemUpdateShown) return;
-    
-    this.systemUpdateShown = true;
-    const update = getRandomElement(SYSTEM_UPDATES);
-    
-    // Show system update popup
-    this.showPopup(update.title, update.message);
-    
-    // Enable psychedelic background immediately when user accepts (handled in acceptSuggestion)
-    // The 3-second delay is removed since we want immediate activation
-  }
-
   private enablePsychedelicBackground(): void {
     if (this.psychedelicEnabled) return;
     
@@ -654,37 +639,10 @@ export class WritingAssistant {
   }
 
   private enableDullMode(): void {
-    this.dullModeEnabled = true;
-    
-    // Completely disable psychedelic mode first
-    this.psychedelicEnabled = false;
-    this.body.classList.remove('psychedelic-mode');
-    this.body.style.background = '';
-    
-    // Stop psychedelic animation
-    if (this.psychedelicTimer) {
-      clearInterval(this.psychedelicTimer);
-      this.psychedelicTimer = undefined;
-    }
-    
-    // Reset current color index
-    this.currentColorIndex = 0;
-    
-    // Reset the save button text when entering dull mode
-    const saveButton = document.getElementById('save-button') as HTMLButtonElement;
-    if (saveButton) {
-      saveButton.textContent = '💾 Save to Cloud';
-    }
-    
-    // Small delay to ensure psychedelic mode is completely disabled
-    setTimeout(() => {
-      // Now enable dull mode
-      this.body.classList.add('dull-mode');
-    }, 100);
+    this.body.classList.add('dull-mode');
   }
 
   private disableDullMode(): void {
-    this.dullModeEnabled = false;
     this.body.classList.remove('dull-mode');
   }
 
