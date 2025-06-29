@@ -172,6 +172,12 @@ export class WritingAssistant {
       const message = getRandomElement(this.getScribblesMessages());
       this.showScribbles(message);
     });
+
+    // Add save button hover functionality
+    const saveButton = document.getElementById('save-button');
+    if (saveButton) {
+      saveButton.addEventListener('mouseenter', this.handleSaveButtonHover.bind(this));
+    }
   }
 
   private handleInput(): void {
@@ -426,5 +432,20 @@ export class WritingAssistant {
     if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
     if (this.randomInterferenceTimer) clearInterval(this.randomInterferenceTimer);
     if (this.clippyTimer) clearInterval(this.clippyTimer);
+  }
+
+  private handleSaveButtonHover(event: Event): void {
+    const button = event.target as HTMLElement;
+    
+    // Make the button move even more when hovered
+    const randomX = (Math.random() - 0.5) * 100; // Random movement between -50 and 50px
+    const randomY = (Math.random() - 0.5) * 100;
+    
+    button.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    
+    // Reset position after a short delay
+    setTimeout(() => {
+      button.style.transform = '';
+    }, 300);
   }
 } 
