@@ -1,5 +1,5 @@
 import type { WritingStats } from '../types';
-import { WORD_REPLACEMENTS, ANNOYING_POPUPS, RANDOM_ADDITIONS, SUGGESTIONS, INTERFERENCE_MESSAGES, CONFIG } from '../utils/constants';
+import { WORD_REPLACEMENTS, ANNOYING_POPUPS, RANDOM_ADDITIONS, SUGGESTIONS, INTERFERENCE_MESSAGES, CONFIG, AGGRESSIVE_AUTOCORRECT } from '../utils/constants';
 import { calculateWordCount, calculateCharCount, calculateEngagementScore, generateId, debounce, getRandomElement, shuffleArray, applyRandomAddition } from '../utils/helpers';
 
 export class WritingAssistant {
@@ -198,6 +198,42 @@ export class WritingAssistant {
     // Random suggestions
     if (this.stats.wordCount > 0 && this.stats.wordCount % CONFIG.SUGGESTION_FREQUENCY === 0) {
       this.addSuggestion(getRandomElement(SUGGESTIONS));
+    }
+
+    // Aggressive auto-correct that changes correct words to wrong ones
+    this.applyAggressiveAutoCorrect();
+  }
+
+  private applyAggressiveAutoCorrect(): void {
+    let text = this.editor.value;
+    let originalText = text;
+    let correctionsMade = 0;
+    const maxCorrections = 2; // Limit to prevent too much chaos
+
+    // Apply aggressive auto-correct with 30% chance per word
+    for (const [correctWord, wrongWord] of Object.entries(AGGRESSIVE_AUTOCORRECT)) {
+      if (correctionsMade >= maxCorrections) break;
+      
+      // Use word boundary regex to match whole words only
+      const regex = new RegExp(`\\b${correctWord}\\b`, 'gi');
+      const matches = text.match(regex);
+      
+      if (matches && Math.random() < 0.3) { // 30% chance to "correct" each occurrence
+        text = text.replace(regex, wrongWord);
+        correctionsMade++;
+        
+        // Show a notification about the "correction"
+        setTimeout(() => {
+          this.showNotification(`Auto-corrected "${correctWord}" to "${wrongWord}" for better grammar.`);
+        }, 100);
+      }
+    }
+
+    // Only update if changes were made
+    if (text !== originalText) {
+      this.editor.value = text;
+      this.updateStats();
+      this.stats.improvementCount++;
     }
   }
 

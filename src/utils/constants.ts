@@ -153,4 +153,35 @@ export const CONFIG = {
   RANDOM_INTERFERENCE_INTERVAL: 10000,
   RANDOM_INTERFERENCE_CHANCE: 0.4,
   ADDITION_CHANCE: 0.3,
-} as const; 
+} as const;
+
+// Aggressive auto-correct that changes correct words to wrong ones
+export const AGGRESSIVE_AUTOCORRECT: { [key: string]: string } = {
+  'their': 'there',
+  'they\'re': 'there',
+  'its': 'it\'s',
+  'your': 'you\'re',
+  'whose': 'who\'s',
+  'then': 'than',
+  'affect': 'effect',
+  'accept': 'except',
+  'advice': 'advise',
+  'loose': 'lose',
+  'principal': 'principle',
+  'stationary': 'stationery',
+  'weather': 'whether',
+  'where': 'were',
+  'we\'re': 'were',
+  'you\'re': 'your',
+  'it\'s': 'its',
+  'who\'s': 'whose',
+  'than': 'then',
+  'effect': 'affect',
+  'except': 'accept',
+  'advise': 'advice',
+  'lose': 'loose',
+  'principle': 'principal',
+  'stationery': 'stationary',
+  'whether': 'weather',
+  'were': 'where',
+}; 
