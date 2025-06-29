@@ -670,6 +670,12 @@ export class WritingAssistant {
     // Reset current color index
     this.currentColorIndex = 0;
     
+    // Reset the save button text when entering dull mode
+    const saveButton = document.getElementById('save-button') as HTMLButtonElement;
+    if (saveButton) {
+      saveButton.textContent = '💾 Save to Cloud';
+    }
+    
     // Small delay to ensure psychedelic mode is completely disabled
     setTimeout(() => {
       // Now enable dull mode
