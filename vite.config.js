@@ -5,14 +5,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['typescript']
-        }
-      }
-    }
+    sourcemap: true
   },
   server: {
     port: 3000,
