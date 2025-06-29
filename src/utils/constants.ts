@@ -4,7 +4,7 @@ export const WORD_REPLACEMENTS: WordReplacement[] = [
   { original: 'the', replacement: 'the supposed', category: 'formal', mode: 'prepend' },
   { original: 'and', replacement: 'and/or', category: 'corporate', mode: 'replace' },
   { original: 'is', replacement: 'appears to be', category: 'formal', mode: 'replace' },
-  { original: 'was', replacement: 'allegedly', category: 'formal', mode: 'prepend' },
+  { original: 'was', replacement: 'allegedly occurred', category: 'formal', mode: 'replace' },
   { original: 'said', replacement: 'claims', category: 'formal', mode: 'replace' },
   { original: 'good', replacement: 'adequate', category: 'professional', mode: 'replace' },
   { original: 'bad', replacement: 'suboptimal', category: 'professional', mode: 'replace' },

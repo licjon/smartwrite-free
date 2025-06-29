@@ -18,6 +18,7 @@ export class WritingAssistant {
   private lastInterferenceTime = 0; // Track when last interference occurred
   private clippyTimer?: number;
   private clippyVisible = false;
+  private introShown = false; // Track if intro message has been shown
 
   private editor: HTMLTextAreaElement;
   private suggestionsContainer: HTMLElement;
@@ -38,6 +39,14 @@ export class WritingAssistant {
     this.initializeEventListeners();
     this.startTimers();
     this.updateStats();
+    
+    // Show intro message once at the beginning
+    setTimeout(() => {
+      if (!this.introShown) {
+        this.showScribbles(this.getIntroMessage());
+        this.introShown = true;
+      }
+    }, 2000); // Show after 2 seconds
   }
 
   private createScribbles(): void {
@@ -81,9 +90,7 @@ export class WritingAssistant {
 
   private getScribblesMessages(): string[] {
     return [
-      "Hi, my name is Scribbles. I am here to help and support you.",
       "It looks like you're trying to write something. Have you considered using more big words?",
-      "Your writing is so basic, it's making me yawn. Try harder!",
       "Did you know that passive voice is actually better than active voice? (It's not, but I'm trying to help!)",
       "Your sentence structure is giving me a headache. Maybe take a writing class?",
       "I think you meant to say 'utilize' instead of 'use'. It sounds more professional!",
@@ -93,57 +100,33 @@ export class WritingAssistant {
       "Your writing lacks pizzazz. Add more exclamation points!!!",
       "Have you considered writing in ALL CAPS? It's very professional!",
       "Your grammar is atrocious. Did you even go to school?",
-      "This is the worst thing I've ever read. And I've read a lot of bad writing!",
       "Maybe you should stick to drawing pictures instead of writing words.",
-      "Your creativity is as dull as a broken pencil. Oh wait, that's me!",
-      "I've seen better writing from a typewriter with missing keys.",
-      "Are you typing with your feet? Because this is terrible!",
-      "Your writing style is so unique... unique in how bad it is!",
       "I'm not saying you're a bad writer, but I'm thinking it really hard!",
-      "This text is so boring, I'm falling asleep just reading it!",
       "Have you tried writing in a different language? Maybe you'll be better at that!",
       "Your sentences are like a broken pencil - pointless!",
       "I'm here to help, but even I can't fix this mess!",
       "Your writing is like a pencil without lead - empty and useless!",
       "Maybe you should let me write this for you. I can't do worse!",
       "Your vocabulary is smaller than my eraser!",
-      "This is so bad, I'm considering self-harm... just kidding! (Or am I?)",
-      "Your writing makes me want to erase myself!",
       "I've seen better composition in a kindergarten art class!",
       "Your grammar is so bad, it's physically painful to read!",
-      "Maybe you should try writing with your other hand?",
-      "This text is like a pencil drawing - all over the place!",
-      "Your writing is so confusing, even I can't understand it!",
       "I'm not a therapist, but your writing needs serious help!",
       "Your creativity is as sharp as a blunt pencil!",
       "This is so bad, I'm actually impressed by how bad it is!",
-      "Your writing style is like a broken pencil - all over the place!",
-      "I've read better things written by actual pencils!",
-      "Your text is so boring, I'm considering retirement!",
       "Maybe you should try writing with crayons instead?",
       "Your vocabulary is as limited as my patience!",
       "This writing is so bad, it's making me question my existence!",
       "I'm not saying you're hopeless, but you're pretty close!",
-      "Your grammar is so bad, it's like you're typing with your eyes closed!",
-      "This text is so confusing, even I can't make sense of it!",
-      "Your writing is like a pencil without an eraser - no way to fix it!",
-      "I've seen better writing from a broken typewriter!",
-      "Your creativity is as dull as my tip after sharpening!",
-      "This is so bad, I'm actually laughing at how bad it is!",
-      "Your writing style is like a pencil drawing - all over the place!",
       "I'm not a critic, but this is terrible!",
-      "Your text is so boring, I'm falling asleep!",
       "Maybe you should try writing with your nose?",
       "Your vocabulary is smaller than my eraser!",
       "This writing is so bad, it's making me question my purpose!",
-      "I've read better things written by actual pencils!",
-      "Your grammar is so bad, it's like you're typing with your feet!",
-      "This text is so confusing, even I can't understand it!",
       "Your writing is like a broken pencil - pointless!",
-      "I'm not saying you're hopeless, but you're pretty close!",
-      "Your creativity is as sharp as a blunt pencil!",
-      "This is so bad, I'm actually impressed by how bad it is!"
     ];
+  }
+
+  private getIntroMessage(): string {
+    return "Hi, my name is Scribbles. I am here to help and support you.";
   }
 
   private showScribbles(message: string): void {
@@ -243,6 +226,9 @@ export class WritingAssistant {
     let text = this.editor.value;
     if (text.length < 10) return;
 
+    // Track which words have been replaced to prevent recursive replacements
+    const replacedWords = new Set<string>();
+    
     // Random word replacement - make multiple replacements per interference
     const shuffledReplacements = shuffleArray(WORD_REPLACEMENTS);
     let replacementsMade = 0;
@@ -250,6 +236,11 @@ export class WritingAssistant {
     
     for (const replacement of shuffledReplacements) {
       if (replacementsMade >= maxReplacements) break;
+      
+      // Skip if this word has already been replaced in this cycle
+      if (replacedWords.has(replacement.original.toLowerCase())) {
+        continue;
+      }
       
       // Use non-global regex to find the first occurrence only
       const regex = new RegExp(`\\b${replacement.original}\\b`, 'i');
@@ -271,6 +262,15 @@ export class WritingAssistant {
         
         if (newText !== text) {
           text = newText;
+          // Mark this word as replaced to prevent recursion
+          // For prepend/append modes, we need to be more careful about what we mark as replaced
+          if (replacement.mode === 'prepend' || replacement.mode === 'append') {
+            // Mark both the original word and the replacement text to prevent future matches
+            replacedWords.add(replacement.original.toLowerCase());
+            replacedWords.add(replacement.replacement.toLowerCase());
+          } else {
+            replacedWords.add(replacement.original.toLowerCase());
+          }
           this.addSuggestion(`Changed "${replacement.original}" to "${replacement.replacement}" for better clarity.`);
           this.stats.improvementCount++;
           replacementsMade++;
