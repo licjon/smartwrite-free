@@ -1,0 +1,477 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Header styles */
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.ai-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.ai-indicator {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Container and layout */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 2rem;
+}
+
+/* Editor section */
+.editor-section {
+  flex: 2;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.editor-header {
+  background: #f8fafc;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+}
+
+.editor {
+  width: 100%;
+  height: 500px;
+  border: none;
+  outline: none;
+  padding: 1.5rem;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: none;
+  font-family: 'Georgia', serif;
+}
+
+/* Sidebar */
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* AI Suggestions */
+.ai-suggestions {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.suggestions-header {
+  background: #667eea;
+  color: white;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.suggestions-content {
+  padding: 1rem 1.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.suggestion {
+  background: #f1f5f9;
+  border-left: 4px solid #667eea;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+}
+
+/* Stats */
+.stats {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.stats h3 {
+  margin-bottom: 1rem;
+  color: #334155;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #667eea;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.notification.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Popup */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  z-index: 1001;
+  max-width: 400px;
+  width: 90%;
+  display: none;
+}
+
+.popup.show {
+  display: block;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+}
+
+.popup-overlay.show {
+  display: block;
+}
+
+.popup h3 {
+  margin-bottom: 1rem;
+  color: #334155;
+}
+
+.popup-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Scribbles container */
+.clippy-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 120px;
+}
+
+.clippy {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  transform: scale(1);
+  opacity: 1;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  cursor: pointer;
+}
+
+.clippy.visible {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.clippy-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: scribblesBounce 2s ease-in-out infinite;
+}
+
+@keyframes scribblesBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.clippy-pencil {
+  position: absolute;
+  width: 64px;
+  height: 72px;
+  top: 4px;
+  left: 8px;
+  transform: rotate(-15deg);
+}
+
+.pencil-tip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 22px solid #8B4513;
+}
+
+.pencil-body {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 42px;
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pencil-eraser {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 10px;
+  background: #FF69B4;
+  border-radius: 0 0 2px 2px;
+}
+
+.clippy-eyes {
+  position: absolute;
+  top: 36px;
+  left: 58%;
+  transform: translateX(-50%) rotate(-15deg);
+  display: flex;
+  gap: 6px;
+}
+
+.eye {
+  width: 5px;
+  height: 5px;
+  background: #333;
+  border-radius: 50%;
+  animation: scribblesBlink 3s infinite;
+}
+
+@keyframes scribblesBlink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.clippy-mouth {
+  position: absolute;
+  bottom: 20px;
+  left: 60%;
+  transform: translateX(-50%) rotate(-15deg);
+  width: 10px;
+  height: 5px;
+  border: 2px solid #333;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  animation: scribblesTalk 2s ease-in-out infinite;
+}
+
+@keyframes scribblesTalk {
+  0%, 100% { transform: translateX(-50%) rotate(-15deg) scaleY(1); }
+  50% { transform: translateX(-50%) rotate(-15deg) scaleY(1.2); }
+}
+
+.clippy-speech-bubble {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%) scale(0) translateY(20px);
+  background: white;
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 12px;
+  max-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 1000;
+}
+
+.clippy-speech-bubble.visible {
+  transform: translateX(-50%) scale(1) translateY(0);
+  opacity: 1;
+}
+
+.speech-content {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #333;
+  font-weight: 500;
+}
+
+.speech-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #333;
+}
+
+.speech-arrow::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .editor {
+    height: 300px;
+  }
+
+  .popup {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .clippy {
+    width: 80px;
+    height: 80px;
+  }
+
+  .clippy-pencil {
+    width: 64px;
+    height: 72px;
+    top: 4px;
+    left: 8px;
+  }
+
+  .pencil-tip {
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 22px solid #8B4513;
+  }
+
+  .pencil-body {
+    width: 22px;
+    height: 42px;
+  }
+
+  .pencil-eraser {
+    width: 22px;
+    height: 10px;
+  }
+
+  .clippy-eyes {
+    top: 36px;
+    left: 58%;
+  }
+
+  .clippy-mouth {
+    bottom: 20px;
+    left: 60%;
+  }
+
+  .clippy-speech-bubble {
+    max-width: 200px;
+    bottom: 70px;
+  }
+} 

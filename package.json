@@ -1,0 +1,39 @@
+{
+  "name": "smartwrite-free",
+  "version": "1.0.0",
+  "description": "A satirical AI writing assistant that demonstrates the pitfalls of over-automation",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.ts",
+    "lint:fix": "eslint src --ext .js,.ts --fix",
+    "format": "prettier --write src/**/*.{js,ts,css,html}",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ai",
+    "writing",
+    "satire",
+    "productivity",
+    "web-app"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "prettier": "^3.1.0",
+    "typescript": "^5.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/smartwrite-free.git"
+  },
+  "homepage": "https://yourusername.github.io/smartwrite-free"
+} 
