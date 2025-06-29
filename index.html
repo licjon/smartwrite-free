@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartWrite - AI-Powered Writing Assistant</title>
+  <script type="module" crossorigin src="/smartwrite-free/assets/index-qn1Gy4Lk.js"></script>
+  <link rel="stylesheet" crossorigin href="/smartwrite-free/assets/index-Dvc1A5Qv.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">SmartWrite Free</div>
+        <div class="ai-status">
+            <div class="ai-indicator"></div>
+            AI Assistant Active
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="editor-section">
+            <div class="editor-header">
+                <div class="document-info">Your Document - Untitled.docx</div>
+                <button class="save-button" id="save-button" onclick="handleSaveClick()">💾 Save to Cloud</button>
+            </div>
+            <textarea class="editor" id="editor" placeholder="Start writing your masterpiece..."></textarea>
+        </div>
+        
+        <div class="sidebar">
+            <div class="ai-suggestions">
+                <div class="suggestions-header">
+                    🤖 AI Suggestions
+                </div>
+                <div class="suggestions-content" id="suggestions">
+                    <div class="suggestion">
+                        Welcome to SmartWrite! I'm here to help make your writing more professional and engaging.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <h3>Writing Stats</h3>
+                <div class="stat-item">
+                    <span>Words:</span>
+                    <span id="word-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Characters:</span>
+                    <span id="char-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>AI Improvements:</span>
+                    <span id="improvement-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Engagement Score:</span>
+                    <span id="engagement-score">0%</span>
+                </div>
+            </div>
+            
+            <div class="clippy-container" id="clippy-container">
+                <!-- Scribbles will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="popup-overlay" id="popup-overlay"></div>
+    <div class="popup" id="popup">
+        <h3 id="popup-title">AI Assistant</h3>
+        <p id="popup-message"></p>
+        <div class="popup-buttons">
+            <button class="btn btn-primary" onclick="acceptSuggestion()">Accept</button>
+            <button class="btn btn-secondary" onclick="dismissPopup()">Dismiss</button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+</body>
+</html>
