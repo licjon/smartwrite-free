@@ -1,5 +1,5 @@
 import type { WritingStats } from '../types';
-import { WORD_REPLACEMENTS, ANNOYING_POPUPS, RANDOM_ADDITIONS, SUGGESTIONS, INTERFERENCE_MESSAGES, CONFIG, AGGRESSIVE_AUTOCORRECT } from '../utils/constants';
+import { WORD_REPLACEMENTS, ANNOYING_POPUPS, RANDOM_ADDITIONS, SUGGESTIONS, INTERFERENCE_MESSAGES, CONFIG, AGGRESSIVE_AUTOCORRECT, SYSTEM_UPDATES, PSYCHEDELIC_CONFIG } from '../utils/constants';
 import { calculateWordCount, calculateCharCount, calculateEngagementScore, generateId, debounce, getRandomElement, shuffleArray, applyRandomAddition } from '../utils/helpers';
 
 export class WritingAssistant {
@@ -19,6 +19,10 @@ export class WritingAssistant {
   private clippyTimer?: number;
   private clippyVisible = false;
   private introShown = false; // Track if intro message has been shown
+  private psychedelicEnabled = false;
+  private psychedelicTimer?: number;
+  private currentColorIndex = 0;
+  private systemUpdateShown = false;
 
   private editor: HTMLTextAreaElement;
   private suggestionsContainer: HTMLElement;
@@ -27,6 +31,7 @@ export class WritingAssistant {
   private notification: HTMLElement;
   private clippy!: HTMLElement;
   private clippySpeechBubble!: HTMLElement;
+  private body: HTMLBodyElement;
 
   constructor() {
     this.editor = document.getElementById('editor') as HTMLTextAreaElement;
@@ -34,6 +39,7 @@ export class WritingAssistant {
     this.popup = document.getElementById('popup') as HTMLElement;
     this.popupOverlay = document.getElementById('popup-overlay') as HTMLElement;
     this.notification = document.getElementById('notification') as HTMLElement;
+    this.body = document.body;
 
     this.createScribbles();
     this.initializeEventListeners();
@@ -47,6 +53,11 @@ export class WritingAssistant {
         this.introShown = true;
       }
     }, 2000); // Show after 2 seconds
+
+    // Trigger system update after some time
+    setTimeout(() => {
+      this.triggerSystemUpdate();
+    }, 10000); // Show system update after 10 seconds
   }
 
   private createScribbles(): void {
@@ -122,6 +133,27 @@ export class WritingAssistant {
       "Your vocabulary is smaller than my eraser!",
       "This writing is so bad, it's making me question my purpose!",
       "Your writing is like a broken pencil - pointless!",
+      // Psychedelic messages (when psychedelic mode is active)
+      "Whoa, dude! The colors are totally helping your writing flow!",
+      "I can see the words dancing on the screen! Groovy!",
+      "Your creativity is flowing like a rainbow river!",
+      "The universe is speaking through your keyboard!",
+      "I'm tripping on your sentence structure, man!",
+      "The colors are telling me you need more exclamation points!!!",
+      "I can feel the cosmic energy in your prose!",
+      "Your words are like butterflies in a kaleidoscope!",
+      "The matrix is speaking through your fingertips!",
+      "I'm seeing patterns in your writing that transcend reality!",
+      "Your creativity is expanding like the universe itself!",
+      "The colors are showing me the truth about your grammar!",
+      "I'm experiencing a spiritual awakening through your text!",
+      "Your words are like a psychedelic journey through time!",
+      "The cosmic forces are guiding your writing hand!",
+      "I can see the future of literature in your sentences!",
+      "Your prose is like a rainbow bridge to enlightenment!",
+      "The colors are revealing the hidden meaning in your words!",
+      "I'm having a transcendental experience with your grammar!",
+      "Your writing is like a cosmic dance of consciousness!",
     ];
   }
 
@@ -135,7 +167,7 @@ export class WritingAssistant {
     this.clippyVisible = true;
     this.clippy.classList.add('visible');
     
-    const speechContent = this.clippy.querySelector('.speech-content') as HTMLElement;
+    const speechContent = this.clippySpeechBubble.querySelector('.speech-content') as HTMLElement;
     if (speechContent) {
       speechContent.textContent = message;
     }
@@ -157,7 +189,24 @@ export class WritingAssistant {
   private startScribblesTimer(): void {
     this.clippyTimer = setInterval(() => {
       if (this.editor.value.length > 10 && Math.random() < 0.3) {
-        const message = getRandomElement(this.getScribblesMessages());
+        const messages = this.getScribblesMessages();
+        let message;
+        
+        // If psychedelic mode is active, prefer psychedelic messages
+        if (this.psychedelicEnabled) {
+          const psychedelicMessages = messages.slice(33); // Psychedelic messages start at index 33
+          const regularMessages = messages.slice(0, 33);
+          
+          // 70% chance for psychedelic messages, 30% for regular
+          if (Math.random() < 0.7) {
+            message = getRandomElement(psychedelicMessages);
+          } else {
+            message = getRandomElement(regularMessages);
+          }
+        } else {
+          message = getRandomElement(messages.slice(0, 33)); // Only regular messages
+        }
+        
         this.showScribbles(message);
       }
     }, 15000); // Show Scribbles every 15 seconds with 30% chance
@@ -169,7 +218,24 @@ export class WritingAssistant {
     
     // Add click interaction to Scribbles
     this.clippy.addEventListener('click', () => {
-      const message = getRandomElement(this.getScribblesMessages());
+      const messages = this.getScribblesMessages();
+      let message;
+      
+      // If psychedelic mode is active, prefer psychedelic messages
+      if (this.psychedelicEnabled) {
+        const psychedelicMessages = messages.slice(33); // Psychedelic messages start at index 33
+        const regularMessages = messages.slice(0, 33);
+        
+        // 70% chance for psychedelic messages, 30% for regular
+        if (Math.random() < 0.7) {
+          message = getRandomElement(psychedelicMessages);
+        } else {
+          message = getRandomElement(regularMessages);
+        }
+      } else {
+        message = getRandomElement(messages.slice(0, 33)); // Only regular messages
+      }
+      
       this.showScribbles(message);
     });
 
@@ -177,6 +243,14 @@ export class WritingAssistant {
     const saveButton = document.getElementById('save-button');
     if (saveButton) {
       saveButton.addEventListener('mouseenter', this.handleSaveButtonHover.bind(this));
+    }
+
+    // Add test psychedelic button
+    const testPsychedelicButton = document.getElementById('test-psychedelic');
+    if (testPsychedelicButton) {
+      testPsychedelicButton.addEventListener('click', () => {
+        this.togglePsychedelicMode();
+      });
     }
   }
 
@@ -432,20 +506,124 @@ export class WritingAssistant {
     if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
     if (this.randomInterferenceTimer) clearInterval(this.randomInterferenceTimer);
     if (this.clippyTimer) clearInterval(this.clippyTimer);
+    if (this.psychedelicTimer) clearInterval(this.psychedelicTimer);
+    this.disablePsychedelicBackground();
   }
 
   private handleSaveButtonHover(event: Event): void {
-    const button = event.target as HTMLElement;
+    const button = event.target as HTMLButtonElement;
+    const originalText = button.textContent;
     
-    // Make the button move even more when hovered
-    const randomX = (Math.random() - 0.5) * 100; // Random movement between -50 and 50px
-    const randomY = (Math.random() - 0.5) * 100;
+    // Change button text to something ridiculous
+    button.textContent = '🚀 Launch to Mars';
     
-    button.style.transform = `translate(${randomX}px, ${randomY}px)`;
-    
-    // Reset position after a short delay
+    // Reset after a delay
     setTimeout(() => {
-      button.style.transform = '';
-    }, 300);
+      button.textContent = originalText;
+    }, 2000);
+  }
+
+  private triggerSystemUpdate(): void {
+    if (this.systemUpdateShown) return;
+    
+    this.systemUpdateShown = true;
+    const update = getRandomElement(SYSTEM_UPDATES);
+    
+    // Show system update popup
+    this.showPopup(update.title, update.message);
+    
+    // Enable psychedelic background after user accepts
+    setTimeout(() => {
+      this.enablePsychedelicBackground();
+    }, 3000);
+  }
+
+  private enablePsychedelicBackground(): void {
+    if (this.psychedelicEnabled) return;
+    
+    this.psychedelicEnabled = true;
+    this.body.classList.add('psychedelic-mode');
+    this.startPsychedelicAnimation();
+    
+    // Show notification
+    this.showNotification('🎨 Psychedelic mode activated! Your creativity is now enhanced!', 5000);
+    
+    // Add some psychedelic Scribbles messages
+    setTimeout(() => {
+      this.showScribbles("Whoa, dude! The colors are totally helping your writing flow!");
+    }, 2000);
+
+    // Update test button text
+    const testButton = document.getElementById('test-psychedelic');
+    if (testButton) {
+      testButton.textContent = '🌙 Disable Psychedelic';
+      testButton.style.background = '#8338ec';
+    }
+  }
+
+  private startPsychedelicAnimation(): void {
+    this.psychedelicTimer = setInterval(() => {
+      this.updatePsychedelicBackground();
+    }, PSYCHEDELIC_CONFIG.ANIMATION_SPEED);
+  }
+
+  private updatePsychedelicBackground(): void {
+    if (!this.psychedelicEnabled) return;
+    
+    const colors = PSYCHEDELIC_CONFIG.COLOR_TRANSITIONS;
+    const patterns = PSYCHEDELIC_CONFIG.PATTERNS;
+    
+    // Cycle through colors
+    const color1 = colors[this.currentColorIndex];
+    const color2 = colors[(this.currentColorIndex + 1) % colors.length];
+    const color3 = colors[(this.currentColorIndex + 2) % colors.length];
+    
+    // Random pattern
+    const pattern = getRandomElement(patterns);
+    
+    let background = '';
+    switch (pattern) {
+      case 'radial-gradient':
+        background = `radial-gradient(circle at ${Math.random() * 100}% ${Math.random() * 100}%, ${color1}, ${color2}, ${color3})`;
+        break;
+      case 'linear-gradient':
+        background = `linear-gradient(${Math.random() * 360}deg, ${color1}, ${color2}, ${color3})`;
+        break;
+      case 'conic-gradient':
+        background = `conic-gradient(from ${Math.random() * 360}deg, ${color1}, ${color2}, ${color3})`;
+        break;
+      case 'repeating-linear-gradient':
+        background = `repeating-linear-gradient(${Math.random() * 360}deg, ${color1} 0%, ${color2} 25%, ${color3} 50%)`;
+        break;
+    }
+    
+    this.body.style.background = background;
+    this.currentColorIndex = (this.currentColorIndex + 1) % colors.length;
+  }
+
+  private disablePsychedelicBackground(): void {
+    this.psychedelicEnabled = false;
+    this.body.classList.remove('psychedelic-mode');
+    this.body.style.background = '';
+    
+    if (this.psychedelicTimer) {
+      clearInterval(this.psychedelicTimer);
+      this.psychedelicTimer = undefined;
+    }
+
+    // Update test button text
+    const testButton = document.getElementById('test-psychedelic');
+    if (testButton) {
+      testButton.textContent = '🌙 Enable Psychedelic';
+      testButton.style.background = '';
+    }
+  }
+
+  private togglePsychedelicMode(): void {
+    if (this.psychedelicEnabled) {
+      this.disablePsychedelicBackground();
+    } else {
+      this.enablePsychedelicBackground();
+    }
   }
 } 

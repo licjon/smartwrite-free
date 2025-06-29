@@ -36,4 +36,17 @@ export interface RandomAddition {
   type: 'prefix' | 'suffix' | 'inline' | 'replacement';
   context?: 'sentence_start' | 'sentence_end' | 'word_boundary' | 'anywhere';
   probability: number;
+}
+
+export interface SystemUpdate {
+  title: string;
+  message: string;
+  features: string[];
+}
+
+export interface PsychedelicConfig {
+  ENABLED: boolean;
+  ANIMATION_SPEED: number;
+  COLOR_TRANSITIONS: string[];
+  PATTERNS: string[];
 } 

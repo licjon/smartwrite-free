@@ -184,4 +184,39 @@ export const AGGRESSIVE_AUTOCORRECT: { [key: string]: string } = {
   'stationery': 'stationary',
   'whether': 'weather',
   'were': 'where',
+};
+
+// Fake system update messages
+export const SYSTEM_UPDATES = [
+  {
+    title: '🎨 SmartWrite v2.1.0 - Creative Enhancement Update',
+    message: 'We\'ve added psychedelic backgrounds to boost your creative writing flow! Studies show that trippy visuals increase productivity by 420%.',
+    features: ['Psychedelic background animations', 'Enhanced visual creativity', 'Improved writing flow', 'Bug fixes and performance improvements']
+  },
+  {
+    title: '🌈 SmartWrite v2.1.1 - Rainbow Optimization',
+    message: 'Your feedback requested more colors! We\'ve implemented a full spectrum background system that adapts to your writing mood.',
+    features: ['Dynamic color adaptation', 'Mood-based background selection', 'Enhanced visual feedback', 'Minor bug fixes']
+  },
+  {
+    title: '✨ SmartWrite v2.1.2 - Visual Enhancement Pack',
+    message: 'Because writing should be a visual experience! New backgrounds include: Disco Mode, Acid Trip, and Corporate Rave.',
+    features: ['Multiple background themes', 'Auto-switching animations', 'Visual writing prompts', 'Performance optimizations']
+  }
+];
+
+// Psychedelic background configurations
+export const PSYCHEDELIC_CONFIG = {
+  ENABLED: false,
+  ANIMATION_SPEED: 3000,
+  COLOR_TRANSITIONS: [
+    '#ff006e', '#8338ec', '#3a86ff', '#06ffa5', '#ffbe0b', '#fb5607',
+    '#ff006e', '#8338ec', '#3a86ff', '#06ffa5', '#ffbe0b', '#fb5607'
+  ],
+  PATTERNS: [
+    'radial-gradient',
+    'linear-gradient',
+    'conic-gradient',
+    'repeating-linear-gradient'
+  ]
 }; 
