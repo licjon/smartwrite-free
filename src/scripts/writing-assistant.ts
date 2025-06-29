@@ -53,8 +53,14 @@ export class WritingAssistant {
           <div class="pencil-eraser"></div>
         </div>
         <div class="clippy-eyes">
-          <div class="eye left-eye"></div>
-          <div class="eye right-eye"></div>
+          <div class="eye left-eye">
+            <div class="eye-white"></div>
+            <div class="eye-pupil"></div>
+          </div>
+          <div class="eye right-eye">
+            <div class="eye-white"></div>
+            <div class="eye-pupil"></div>
+          </div>
         </div>
         <div class="clippy-mouth"></div>
       </div>
