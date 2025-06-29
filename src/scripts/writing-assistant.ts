@@ -514,13 +514,15 @@ export class WritingAssistant {
     const button = event.target as HTMLButtonElement;
     const originalText = button.textContent;
     
-    // Change button text to something ridiculous
-    button.textContent = '🚀 Launch to Mars';
-    
-    // Reset after a delay
-    setTimeout(() => {
-      button.textContent = originalText;
-    }, 2000);
+    // Only change button text to something ridiculous if psychedelic mode is active
+    if (this.psychedelicEnabled) {
+      button.textContent = '🚀 Launch to Mars';
+      
+      // Reset after a delay
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 2000);
+    }
   }
 
   private triggerSystemUpdate(): void {
