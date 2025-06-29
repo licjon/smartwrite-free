@@ -84,8 +84,14 @@ export function applyPrefixAddition(text: string, addition: RandomAddition): str
   const { starts } = findSentenceBoundaries(text);
   if (starts.length === 0) return text;
   
-  // Pick a random sentence start (but not the very beginning if it's the only sentence)
-  const startIndex = starts.length > 1 ? starts[Math.floor(Math.random() * starts.length)] : starts[0];
+  // Filter out the very beginning of the text (position 0)
+  const validStarts = starts.filter(start => start > 0);
+  
+  // If no valid sentence starts (only the beginning), don't add prefix
+  if (validStarts.length === 0) return text;
+  
+  // Pick a random sentence start (excluding the very beginning)
+  const startIndex = validStarts[Math.floor(Math.random() * validStarts.length)];
   
   return text.slice(0, startIndex) + addition.text + text.slice(startIndex);
 }
